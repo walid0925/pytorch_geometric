@@ -56,6 +56,7 @@ class GPSConv(torch.nn.Module):
             respective normalization function defined by :obj:`norm`.
             (default: :obj:`None`)
     """
+
     def __init__(
         self,
         channels: int,
@@ -63,9 +64,9 @@ class GPSConv(torch.nn.Module):
         heads: int = 1,
         dropout: float = 0.0,
         attn_dropout: float = 0.0,
-        act: str = 'relu',
+        act: str = "relu",
         act_kwargs: Optional[Dict[str, Any]] = None,
-        norm: Optional[str] = 'batch_norm',
+        norm: Optional[str] = "batch_norm",
         norm_kwargs: Optional[Dict[str, Any]] = None,
     ):
         super().__init__()
@@ -98,7 +99,7 @@ class GPSConv(torch.nn.Module):
         self.norm_with_batch = False
         if self.norm1 is not None:
             signature = inspect.signature(self.norm1.forward)
-            self.norm_with_batch = 'batch' in signature.parameters
+            self.norm_with_batch = "batch" in signature.parameters
 
     def reset_parameters(self):
         r"""Resets all learnable parameters of the module."""
@@ -122,8 +123,9 @@ class GPSConv(torch.nn.Module):
     ) -> Tensor:
         r"""Runs the forward pass of the module."""
         hs = []
+        h = x.clone()
         if self.conv is not None:  # Local MPNN.
-            h = self.conv(x, edge_index, **kwargs)
+            h = self.conv(h, edge_index, **kwargs)
             h = F.dropout(h, p=self.dropout, training=self.training)
             h = h + x
             if self.norm1 is not None:
@@ -158,5 +160,7 @@ class GPSConv(torch.nn.Module):
         return out
 
     def __repr__(self) -> str:
-        return (f'{self.__class__.__name__}({self.channels}, '
-                f'conv={self.conv}, heads={self.heads})')
+        return (
+            f"{self.__class__.__name__}({self.channels}, "
+            f"conv={self.conv}, heads={self.heads})"
+        )
